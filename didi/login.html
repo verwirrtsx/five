@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+		 <link rel="stylesheet" type="text/css" href="https://www.layuicdn.com/layui/css/layui.css" />
+		  <script src="https://www.layuicdn.com/layui/layui.js"></script>
+		  <script src="js/cookie.js" type="text/javascript" charset="utf-8"></script>
+	</head>
+	<style>
+		.body{
+			width: 100%;
+			text-align: center;
+			background-color: deepskyblue;
+		}
+		.form{
+			width: 30%;
+			text-align: center;
+			margin-left: 35%;
+			margin-top: 120px;
+		}
+		.padd{margin-top: 5%;}
+	</style>
+	<body class="body"> 
+		<div id="" class="form">
+			
+		<input type="text" name="name" id="name"  placeholder="少侠请留下你的名字"  class="layui-input padd"/>
+		<input type="password" name="pass" id="pass" placeholder="少侠请输入密码 " class="layui-input padd"/>
+		<input type="button" value="少侠记得点登录"  class="layui-btn padd" onclick="login()"/>
+		
+		</div>
+	</body>
+</html>
+<script>
+
+	function login(){
+			var name =document.getElementById('name').value;
+	var pass = document.getElementById('pass').value;
+	
+		console.log(name)
+		console.log(pass)
+		$.ajax({
+		type:"post",
+		url:"http://192.168.0.172/tp51/public/index.php/login",
+		data:{
+			name:name,
+			pass:pass
+		},
+		success:function(res){
+			console.log(res)
+			if(res== "ok"){
+				setCookie("name" , name , 1);
+				window.location.href="index.html";
+			}
+		},
+		async:true
+	});
+	}
+	
+</script>

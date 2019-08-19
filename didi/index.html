@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+		 <link rel="stylesheet" type="text/css" href="https://www.layuicdn.com/layui/css/layui.css" />
+		  <script src="https://www.layuicdn.com/layui/layui.js"></script>
+		  <script src="js/cookie.js" type="text/javascript" charset="utf-8"></script>
+	</head>
+	<body style="width: 100%;">
+		<canvas id="qipan" width="800" height="800" style="margin-left: calc(50% - 400px); background-color: chocolate;"></canvas>
+	</body>
+</html>
+<script>
+layui.use('layer', function(){ 
+ var $ = layui.jquery, layer = layui.layer; 
+	var canvas=document.getElementById('qipan');
+	var name =getCookie("name");	
+	var ctx=canvas.getContext('2d');
+	var arr=[];
+	var mewin=[];
+	var downer='';
+	var over='';
+	for(var i=0; i<=16;i++){
+		ctx.moveTo(50*i,0);
+		ctx.lineTo(50*i,800);
+		ctx.stroke();
+		ctx.moveTo(0,50*i);
+		ctx.lineTo(800,50*i);
+		ctx.stroke();
+	}
+	
+
+	
+	$("#qipan").click(function(){
+        //标准的获取鼠标点击相对于canvas画布的坐标公式
+        var x = event.pageX - canvas.getBoundingClientRect().left;
+        var y = event.pageY - canvas.getBoundingClientRect().top;
+		var x1=Math.round(x/50)*50;
+		var y1=Math.round(y/50)*50;
+		
+		if(over ==1){
+			layer.msg('游戏结束');
+			return ;
+		}
+		if(x1<50 || x1>750 || y1<50 ||y1 >750){
+			layer.msg('不在棋盘内');
+			return ;
+		}
+		let my=x1+"."+y1;
+		if(in_array(my,arr)){
+			layer.msg('不能在此位置放置');
+			return 0 ;
+		}
+		
+		sendm(x1,y1);
+		//console.log(arr)
+		//qizi(x1,y1)
+    });
+    
+    
+    function issuccess(x,y){
+   	
+   	if(zuoyou(x,y) || shangxia(x,y) ||zuoxie(x,y) ||	youxie(x,y)){
+   	layer.msg('游戏结束');
+   	let  aa = '{"type":"win","name":"'+name+'"}';
+   	ws.send(aa);	
+   	}
+   	
+  	
+    }
+    
+    function zuoyou(x,y){
+    	let cont=0;
+	for(let i=1;i<5;i++){
+	
+		let aaa=parseInt(x)+i*50+"."+y;
+		let bbb=parseInt(x)-i*50+"."+y;
+		if(in_array(aaa,mewin)){
+		cont++;
+		}
+		if(in_array(bbb,mewin)){
+		cont++;
+	
+		}
+	}
+	//console.log(cont)
+	if(cont==4){
+		return true;
+	}
+		
+    }
+        function shangxia(x,y){ 	
+    	  let cont=0;
+	for(let i=1;i<5;i++){
+		let ccc =parseInt(y)+i*50; 
+	 	let ddd =parseInt(y)-i*50; 	
+		let aaa=x+"."+ccc;
+		let bbb=x+"."+ddd;
+		if(in_array(aaa,mewin)){
+		cont++;
+		}
+		if(in_array(bbb,mewin)){
+		cont++;
+	
+		}
+	}
+	console.log(cont)
+	if(cont==4){
+		return true;
+	}
+    	
+    	
+    }
+    function zuoxie(x,y){
+    	 let cont=0;
+    	for(let i=1;i<5;i++){
+	 	let ccc =parseInt(y)+i*50; 
+	 	let ddd =parseInt(y)-i*50; 
+		let aaa=parseInt(x)+i*50+"."+ccc;
+		let bbb=parseInt(x)-i*50+"."+ddd;
+//		console.log(aaa+".....aa")
+//		console.log(bbb+".....bbb")
+		if(in_array(aaa,mewin)){
+		cont++;
+		}
+		if(in_array(bbb,mewin)){
+		cont++;
+	
+		}
+	}
+	//console.log(cont)
+	if(cont==4){
+		return true;
+	}
+    }
+    function youxie(x,y){
+    
+       let cont=0;
+    	for(let i=1;i<5;i++){
+	 	let ccc =parseInt(y)+i*50; 
+	 	let ddd =parseInt(y)-i*50; 
+		let aaa=parseInt(x)+i*50 +"."+ddd;
+		let bbb=parseInt(x)-i*50+"."+ccc;
+//		console.log(aaa)
+		if(in_array(aaa,mewin)){
+		cont++;
+		}
+		if(in_array(bbb,mewin)){
+		cont++;
+	
+		}
+	}
+	
+	if(cont==4){
+		return true;
+    
+    
+    }
+    }
+    function sendm(x,y){
+   	 let  aa = '{"type":"down","name":"'+name+'","x":"'+x+'","y":"'+y+'"}';
+    ws.send(aa);
+    }
+    function qizih(x,y){
+    	
+		let my=x+"."+y;
+		if(in_array(my,arr)){
+			layer.msg('不能在此位置放置');
+			return 0 ;
+		}else{
+		ctx.fillStyle="black";
+		arr.push(my);
+	}    	
+    	
+	ctx.beginPath();
+	ctx.arc(x,y,23,0,Math.PI*2,true);
+	ctx.closePath();
+	ctx.fill();
+	issuccess(x,y);
+    }
+    
+    
+      function qizib(x,y){
+    	
+		let my=x+"."+y;
+		if(in_array(my,arr)){
+			
+			layer.msg('不能在此位置放置');
+			return 0 ;
+		}else{
+		arr.push(my);
+	}    	
+    	
+	ctx.beginPath();
+	ctx.arc(x,y,23,0,Math.PI*2,true);
+	ctx.closePath();
+	ctx.fillStyle="white";
+	ctx.fill();
+    }
+    
+    function  in_array(search,array){
+			for(let b=0;b<array.length;b++){
+				if(array[b]==search){
+					return true;
+				}
+			}
+			
+		}
+
+ 
+ws = new WebSocket("ws://192.168.0.172:2345");
+ws.onopen = function() {
+console.log("连接成功");
+    //ws.send('login');
+  //  console.log("有一个老哥来到房间");
+};
+
+
+ws.onmessage = function(e) {
+	//console.log(e.data)
+	
+	let bb =e.data;
+	var obj = eval('(' + bb + ')');
+	
+	if(obj.type == "down"){
+		//console.log(obj.name == name)
+		if(downer == obj.name){
+			layer.msg('等待对手落子');
+			return ;
+		}else{
+			downer=obj.name;
+		}
+		//console.log(obj.name)
+		
+		if(obj.name == name){	
+		qizih(obj.x,obj.y)
+		let my1=obj.x+"."+obj.y;	
+		mewin.push(my1);
+		}else{		
+		qizib(obj.x,obj.y)
+		}
+		
+	}
+		if(obj.type == "win"){
+		//console.log(obj.name == name)
+		layer.msg(obj.name+'获得胜利');
+		   	over=1;
+	}
+	if(obj.type == "cf"){
+		layer.msg('等待对手下子');
+		return ;
+		
+	}
+	
+	if(obj.type == "login"){
+		layer.msg('有个大帅比来到了房间');
+	}
+//	switch (obj.type){
+//		case "down":
+//		//layer.msg('ddd');		
+//		if(obj.name === name){
+//		
+//		qizih(obj.x,obj.y)
+//		
+//		}else{
+//			
+//		qizib(obj.x,obj.y)
+//		
+//		}
+//		
+//			break;
+//		case "login":
+//		layer.msg('有个大帅比来到了房间');
+//			break;
+//	}
+
+
+};
+
+
+ });
+</script>
