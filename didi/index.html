@@ -9,7 +9,20 @@
 		  <script src="js/cookie.js" type="text/javascript" charset="utf-8"></script>
 	</head>
 	<body style="width: 100%;">
+		<h2 style="text-align: center;">棋王争霸赛-滴滴滴版本</h2>
 		<canvas id="qipan" width="800" height="800" style="margin-left: calc(50% - 400px); background-color: chocolate;"></canvas>
+		<div style="width: 820px;margin-left: calc(50% - 400px);" class="layui-form-item">
+			<div id="" class="layui-input-inline" style="width: 600px;">
+				<input type="text" name="mes" id="mes" class="layui-input" />
+			</div>
+	
+			<!--<select name="" style="width: 600px; height: 38px;">
+				<option value=""></option>
+			</select>-->
+			<div id="" class="layui-input-inline" style="width: 200px;">
+			<button class="layui-btn "style="width: 190px; text-align: center;" onclick="mesg()">发送</button>
+			</div>
+		</div>
 	</body>
 </html>
 <script>
@@ -68,7 +81,20 @@ layui.use('layer', function(){
    	ws.send(aa);	
    	}
    	
-  	
+    }
+    
+document.onkeydown = function(e){
+        var ev = document.all ? window.event : e;
+        if(ev.keyCode==13) {
+            mesg();
+           let mes =document.getElementById("mes").value=''; 
+        }
+    }
+
+   window.mesg = function (){ 
+    	let mes =document.getElementById("mes").value;
+    	let  aa = '{"type":"mes","name":"'+name+'","mes":"'+mes+'"}';
+    	ws.send(aa);
     }
     
     function zuoyou(x,y){
@@ -252,6 +278,10 @@ ws.onmessage = function(e) {
 		layer.msg('等待对手下子');
 		return ;
 		
+	}
+	
+		if(obj.type == "mes"){
+		layer.msg(obj.name+':'+obj.mes);		
 	}
 	
 	if(obj.type == "login"){
